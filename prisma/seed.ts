@@ -4,9 +4,9 @@ import prisma from "@/lib/prisma";
 async function main() {
   const res = await auth.api.signUpEmail({
     body: {
-      email: "seed@example.com",
-      password: "password123",
-      name: "Seed User",
+      email: "superadmin@mymedica.com",
+      password: "superadmin",
+      name: "Super Admin",
     },
   });
 
