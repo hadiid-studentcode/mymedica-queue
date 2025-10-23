@@ -17,12 +17,9 @@ model User {
   updatedAt     DateTime  @default(now()) @updatedAt
   sessions      Session[]
   accounts      Account[]
-
-  tenantId String
-  tenant   Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  Tenant        Tenant[]
 
   @@unique([email])
-  @@index([tenantId])
   @@map("user")
 }
 
@@ -75,7 +72,8 @@ model Tenant {
   id   String @id @default(cuid())
   name String
 
-  users   User[]
+  userId  String
+  user    User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   stages  QueueStage[]
   entries QueueEntry[]
 
@@ -118,8 +116,8 @@ model QueueEntry {
 }
 
 enum Status {
-  WAITING     // Menunggu di tahapan ini
+  WAITING // Menunggu di tahapan ini
   IN_PROGRESS // Sedang dilayani di tahapan ini
-  COMPLETED   // Selesai (bisa untuk riwayat)
-  CANCELLED   // Dibatalkan
+  COMPLETED // Selesai (bisa untuk riwayat)
+  CANCELLED // Dibatalkan
 }

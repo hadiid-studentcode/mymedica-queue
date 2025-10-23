@@ -13,6 +13,7 @@ export default function SignUpPage() {
     setError(null);
 
     const formData = new FormData(e.currentTarget);
+    const tenantName = formData.get("tenant") as string;
 
     const res = await signUp.email({
       name: formData.get("name") as string,
@@ -22,9 +23,18 @@ export default function SignUpPage() {
 
     if (res.error) {
       setError(res.error.message || "Something went wrong.");
-    } else {
-      router.push("/dashboard");
+      return;
     }
+
+    const userId = res.data?.user.id;
+
+    await fetch("/api/tenant", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ tenantName, userId }),
+    });
+
+    router.push("/dashboard");
   }
 
   return (
@@ -37,6 +47,12 @@ export default function SignUpPage() {
         <input
           name="name"
           placeholder="Full Name"
+          required
+          className="w-full rounded-md bg-neutral-900 border border-neutral-700 px-3 py-2"
+        />
+        <input
+          name="tenant"
+          placeholder="Company Name"
           required
           className="w-full rounded-md bg-neutral-900 border border-neutral-700 px-3 py-2"
         />
