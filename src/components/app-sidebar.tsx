@@ -29,7 +29,7 @@ const data = {
   navMain: [
     {
       title: "Manajemen Tenant",
-      url: "#",
+      url: "/tenant",
       icon: IconDatabase,
     },
     {
@@ -45,7 +45,17 @@ const data = {
   ],
 };
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+interface AppSidebarProps{
+  ...props : React.ComponentProps<typeof Sidebar>
+}
+
+export function AppSidebar({
+  
+  user,
+  ...props }: 
+  React.ComponentProps<typeof Sidebar>,
+
+) {
   return (
     <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader>
