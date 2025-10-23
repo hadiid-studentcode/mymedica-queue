@@ -27,7 +27,6 @@ export default function DashboardPage() {
   if (!session?.user)
     return <p className="text-center mt-8 text-white">Redirecting...</p>;
 
-  //add-start: destructure user from session
   const { user } = session;
 
   return (
@@ -41,17 +40,7 @@ export default function DashboardPage() {
     >
       <AppSidebar variant="inset" />
       <SidebarInset>
-        <SiteHeader />
-        <h1 className="text-2xl font-bold">Dashboard</h1>
-        <p>Welcome, {user.name || "User"}!</p>
-        <p>Email: {user.email}</p>
-        {/* add-start: sign out button */}
-        <button
-          onClick={() => signOut()}
-          className="w-full bg-white text-black font-medium rounded-md px-4 py-2 hover:bg-gray-200"
-        >
-          Sign Out
-        </button>
+        <SiteHeader logout={signOut} />
         <div className="flex flex-1 flex-col">
           <div className="@container/main flex flex-1 flex-col gap-2">
             <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
