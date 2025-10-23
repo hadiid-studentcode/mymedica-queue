@@ -25,6 +25,7 @@ export default function LoginPage() {
 
     if (res.error) {
       setError(res.error.message || "Something went wrong.");
+      setLoading(false);
     } else {
       setLoading(false);
       router.push("/dashboard");

@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { SpinnerBadge } from "./spinner-badge";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 interface LoginFormProps {
   className?: string;
@@ -47,7 +48,13 @@ export function LoginForm({
             />
           )}
 
-          {error && <p className="text-red-500">{error}</p>}
+          {error && (
+            <Alert variant="destructive">
+              <AlertDescription>
+                <AlertTitle>{error}</AlertTitle>
+              </AlertDescription>
+            </Alert>
+          )}
         </CardHeader>
         <CardContent>
           <form onSubmit={onSubmit}>
