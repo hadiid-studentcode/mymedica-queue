@@ -5,7 +5,7 @@ export const tenantService = {
     return prisma.tenant.create({
       data: {
         name,
-        userId,
+        userId : userId,
       },
     });
   },
