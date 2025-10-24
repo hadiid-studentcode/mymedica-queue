@@ -4,8 +4,6 @@ import { getSessionCookie } from "better-auth/cookies";
 export function proxy(request: NextRequest) {
   const sessionCookie = getSessionCookie(request);
 
-  console.log(1);
-
   if (!sessionCookie) {
     return NextResponse.redirect(new URL("/sign-in", request.url));
   }
@@ -14,5 +12,5 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: "/dashboard",
+  matcher: ["/dashboard/:path*", "/tenant/:path*"],
 };
