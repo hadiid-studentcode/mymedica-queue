@@ -3,13 +3,13 @@ import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
   try {
-    const { tenantName, userId } = await req.json();
+    const { tenantName,name,email } = await req.json();
 
-    if (!tenantName || !userId) {
+    if (!tenantName) {
       return NextResponse.json({ message: "Invalid data" }, { status: 400 });
     }
 
-    const tenant = await tenantService.create(tenantName, userId);
+    const tenant = await tenantService.create(tenantName, "1");
 
     return NextResponse.json(
       { message: "Tenant created", data: tenant },

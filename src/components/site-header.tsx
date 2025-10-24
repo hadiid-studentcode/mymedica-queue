@@ -11,7 +11,7 @@ export function SiteHeader({ logout }: { logout: () => void }) {
           orientation="vertical"
           className="mx-2 data-[orientation=vertical]:h-4"
         />
-        <h1 className="text-base font-medium">Documents</h1>
+        <h1 className="text-base font-medium">{process.env.NEXT_PUBLIC_APP_NAME}</h1>
         <div className="ml-auto flex items-center gap-2">
           <Button variant="ghost" onClick={logout}>
             Logout
