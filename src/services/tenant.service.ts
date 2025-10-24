@@ -5,7 +5,18 @@ export const tenantService = {
     return prisma.tenant.create({
       data: {
         name,
-        userId : userId,
+        userId: userId,
+      },
+    });
+  },
+
+  getAll: async () => {
+    return prisma.tenant.findMany({
+      include: {
+        user: true,
+      },
+      orderBy: {
+        createdAt: "desc",
       },
     });
   },

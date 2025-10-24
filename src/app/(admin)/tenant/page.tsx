@@ -10,18 +10,39 @@ import { useState } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircleIcon, CheckCircle2Icon } from "lucide-react";
 import { SpinnerBadge } from "@/components/spinner-badge";
+import { useEffect } from "react";
 
 export default function TenantPage() {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState(false);
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const [tenants, setTenants] = useState([]);
 
   const resetAlert = () => {
     setSuccess(false);
     setError(false);
     setMessage("");
   };
+
+  const fetchTenants = async () => {
+    try {
+      const res = await fetch("/api/tenant");
+      const json = await res.json();
+      setTenants(json.data || []);
+    } catch (err) {
+      console.log("Failed to fetch tenants:", err);
+    }
+  };
+
+  useEffect(() => {
+    const loadTenants = async () => {
+      await fetchTenants();
+    };
+    loadTenants();
+  }, []);
+
+  console.log(tenants);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

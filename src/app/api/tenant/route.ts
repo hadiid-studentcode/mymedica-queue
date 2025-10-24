@@ -44,3 +44,16 @@ export async function POST(req: Request) {
     );
   }
 }
+
+export async function GET() {
+  try {
+    const data = await tenantService.getAll();
+    return NextResponse.json({ message: "success", data }, { status: 200 });
+  } catch (error) {
+    console.error("GET tenants error:", error);
+    return NextResponse.json(
+      { message: "Internal Server Error" },
+      { status: 500 }
+    );
+  }
+}
