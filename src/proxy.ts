@@ -11,6 +11,10 @@ export function proxy(request: NextRequest) {
   return NextResponse.next();
 }
 
+// export const config = {
+//   matcher: ["/dashboard/:path*", "/tenant/:path*","/api/tenant/:path*"],
+// };
+
 export const config = {
-  matcher: ["/dashboard/:path*", "/tenant/:path*","/api/tenant/:path*"],
+  matcher: ["/dashboard/:path*", "/tenant/:path*"],
 };

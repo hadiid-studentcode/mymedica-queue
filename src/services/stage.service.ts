@@ -28,13 +28,7 @@ export const stageService = {
       },
     });
   },
-  findById: async (id: string) => {
-    return prisma.queueStage.findUnique({
-      where: {
-        id,
-      },
-    });
-  },
+
   getAll: async (tenantId: string) => {
     return prisma.queueStage.findMany({
       where: {
