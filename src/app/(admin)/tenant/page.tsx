@@ -25,7 +25,7 @@ export default function TenantPage() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    resetAlert(); 
+    resetAlert();
     setLoading(true);
 
     const formData = new FormData(e.currentTarget);
@@ -48,7 +48,7 @@ export default function TenantPage() {
         setError(true);
         setMessage(data.message || `Request failed with status ${res.status}`);
         setLoading(false);
-        return; 
+        return;
       }
 
       setSuccess(true);
