@@ -42,8 +42,6 @@ export default function TenantPage() {
     loadTenants();
   }, []);
 
-  console.log(tenants);
-
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     resetAlert();
@@ -75,10 +73,41 @@ export default function TenantPage() {
       setSuccess(true);
       setMessage(data.message);
       setLoading(false);
+      await fetchTenants();
     } catch (err) {
       setError(true);
       console.log(err);
       setMessage("Something went wrong");
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    resetAlert();
+    setLoading(true);
+
+    try {
+      const res = await fetch(`/api/tenant/${id}`, {
+        method: "DELETE",
+      });
+
+      const data = await res.json();
+      console.log(data);
+
+      if (!res.ok) {
+        throw new Error(
+          data.message || `Request failed with status ${res.status}`
+        );
+      }
+
+      setSuccess(true);
+      setMessage(data.message);
+      await fetchTenants();
+    } catch (err) {
+      setError(true);
+      console.error("Failed to delete tenant:", err); // Gunakan console.error
+      setMessage((err as Error).message || "Something went wrong");
+    } finally {
       setLoading(false);
     }
   };
@@ -159,8 +188,11 @@ export default function TenantPage() {
         }}
       />
 
-      <div className="w-full overflow-x-auto">
-        <TableComponents />
+      <div className="w-full overflow-x-auto p-3">
+        <TableComponents
+          handleDelete={(id: string) => handleDelete(id)}
+          tenants={tenants}
+        />
       </div>
     </div>
   );

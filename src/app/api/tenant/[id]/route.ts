@@ -1,4 +1,5 @@
 import { tenantService } from "@/services/tenant.service";
+import { userService } from "@/services/user.service";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function PUT(
@@ -9,7 +10,6 @@ export async function PUT(
     const { id } = await params;
     const { tenantName } = await req.json();
 
-   
     if (!tenantName) {
       return NextResponse.json({
         message: "Tenant Name Required",
@@ -42,10 +42,21 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params;
-    const data = await tenantService.delete(id);
-    return NextResponse.json({ message: "success", data }, { status: 200 });
+    const tenant = await tenantService.findById(id);
+
+    if (!tenant) {
+      return NextResponse.json(
+        { message: "Tenant not found" },
+        { status: 404 }
+      );
+    }
+    await userService.delete(String(tenant.userId));
+    return NextResponse.json(
+      { message: "User and associated tenant deleted" },
+      { status: 200 }
+    );
   } catch (error) {
-    console.error("DELETE tenants error:", error);
+    console.error("DELETE tenant error:", error);
     return NextResponse.json(
       { message: "Internal Server Error" },
       { status: 500 }

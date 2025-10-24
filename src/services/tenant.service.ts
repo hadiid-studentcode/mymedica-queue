@@ -39,5 +39,13 @@ export const tenantService = {
       },
     });
   },
+
+  findById: async (id: string) => {
+    return prisma.tenant.findUnique({
+      where: {
+        id,
+      },
+    });
+  },
   
 };
