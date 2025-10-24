@@ -84,7 +84,7 @@ model Tenant {
 model QueueStage {
   id    String @id @default(cuid())
   name  String // nama tahapan, contoh : "Poli Umum","Poli Gigi", dll
-  order Int // urutan tahapan
+  order Int // urutan tahapan contoh : 1,2,3
 
   tenantId String
   tenant   Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
@@ -119,5 +119,4 @@ enum Status {
   WAITING // Menunggu di tahapan ini
   IN_PROGRESS // Sedang dilayani di tahapan ini
   COMPLETED // Selesai (bisa untuk riwayat)
-  CANCELLED // Dibatalkan
 }
