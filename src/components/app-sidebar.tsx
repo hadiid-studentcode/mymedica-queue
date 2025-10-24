@@ -45,13 +45,9 @@ const data = {
   ],
 };
 
-interface AppSidebarProps{
-  ...props : React.ComponentProps<typeof Sidebar>
-}
 
 export function AppSidebar({
-  
-  user,
+
   ...props }: 
   React.ComponentProps<typeof Sidebar>,
 
