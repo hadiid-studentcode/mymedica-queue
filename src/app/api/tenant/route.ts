@@ -1,8 +1,8 @@
 import { signUp } from "@/lib/auth-client";
 import { tenantService } from "@/services/tenant.service";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
     const { tenantName, name, email } = await req.json();
 
@@ -12,13 +12,12 @@ export async function POST(req: Request) {
 
     // Buat user
     const userRes = await signUp.email({
-      name : name,
-      email : email,
+      name: name,
+      email: email,
       password: name,
     });
 
     const userId = userRes.data?.user.id;
-
 
     if (!userId) {
       return NextResponse.json(
@@ -57,3 +56,4 @@ export async function GET() {
     );
   }
 }
+

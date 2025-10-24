@@ -20,4 +20,24 @@ export const tenantService = {
       },
     });
   },
+
+  update: async (name: string, id: string) => {
+    return prisma.tenant.update({
+      where: {
+        id,
+      },
+      data: {
+        name,
+      },
+    });
+  },
+
+  delete : async (id: string) => {
+    return prisma.tenant.delete({
+      where: {
+        id,
+      },
+    });
+  },
+  
 };
