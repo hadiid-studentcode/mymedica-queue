@@ -25,7 +25,7 @@ export default function TenantPage() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    resetAlert(); // reset dulu setiap submit
+    resetAlert(); 
     setLoading(true);
 
     const formData = new FormData(e.currentTarget);
@@ -48,7 +48,7 @@ export default function TenantPage() {
         setError(true);
         setMessage(data.message || `Request failed with status ${res.status}`);
         setLoading(false);
-        return; // stop di sini jika error
+        return; 
       }
 
       setSuccess(true);
@@ -64,7 +64,6 @@ export default function TenantPage() {
 
   return (
     <div className="flex flex-col items-start justify-start gap-6 p-4">
-      {/* ALERT SUCCESS */}
       {success && (
         <Alert className="border-green-500">
           <CheckCircle2Icon className="text-green-600" />
@@ -80,7 +79,6 @@ export default function TenantPage() {
         formDialog={() => {
           return (
             <>
-              {/* ALERT ERROR DALAM MODAL */}
               {error && (
                 <Alert variant="destructive">
                   <AlertCircleIcon />
