@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { ArrowRight, Clock, Loader2, Trash2 } from "lucide-react";
+import { ArrowRight, Clock, Loader2, Trash2, Plus } from "lucide-react";
 
 const stages = [
   {
@@ -36,6 +36,22 @@ const stages = [
     title: "Farmasi",
     patients: [],
   },
+  {
+    id: "stage-5",
+    title: "KASIR",
+    patients: [],
+  },
+  {
+    id : "stage-6",
+    title: "Ruang Dokter",
+    patients: [],
+  },
+  {
+    id: "stage-7",
+    title: "Ruang Dokter",
+    patients: [],
+  }
+  
 ];
 
 function PatientCard({
@@ -95,12 +111,20 @@ function PatientCard({
 
 export default function QueueDashboardPage() {
   return (
-    <div className="w-full h-full p-4 md:p-6 overflow-hidden">
+    <div className="p-4 md:p-6">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold tracking-tight">Manajemen Antrian</h1>
+        <button className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors h-10 px-4 py-2 bg-blue-600 text-white hover:bg-blue-600/90">
+          <Plus className="mr-2 h-4 w-4" />
+          Tambah Pasien
+        </button>
+      </div>
+
       <div className="flex gap-4 overflow-x-auto pb-4">
         {stages.map((stage) => (
           <div
             key={stage.id}
-            className="min-w-[300px] w-[300px] md:min-w-[340px] md:w-[340px] flex flex-col"
+            className="min-w-[300px] w-[300px] flex flex-col"
           >
             <div className="flex justify-between items-center p-4 rounded-t-lg bg-slate-100 dark:bg-slate-900">
               <h2 className="font-semibold text-gray-800 dark:text-gray-100">
@@ -111,7 +135,8 @@ export default function QueueDashboardPage() {
               </span>
             </div>
             <div className="h-1 bg-indigo-600 w-full"></div>
-            <div className="flex-1 p-4 bg-slate-100/70 dark:bg-slate-900/70 rounded-b-lg overflow-y-auto space-y-4 min-h-[200px]">
+
+            <div className="p-4 bg-slate-100/70 dark:bg-slate-900/70 rounded-b-lg space-y-4 min-h-[200px]">
               {stage.patients.length > 0 ? (
                 stage.patients.map((patient) => (
                   <PatientCard key={patient.id} patient={patient} />
