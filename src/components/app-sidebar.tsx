@@ -20,20 +20,17 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import Link from "next/link";
+import { useTenant } from "@/context/tenantContext";
 
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
   user: {
     name: string;
     email: string;
   };
-  isTenant: boolean;
 }
 
-export function AppSidebar({
-  user,
-  isTenant,
-  ...sidebarProps
-}: AppSidebarProps) {
+export function AppSidebar({ user, ...sidebarProps }: AppSidebarProps) {
+  const { isTenant } = useTenant();
   const navForTenant = [
     {
       title: "Manajemen Tahapan Antrian",
@@ -42,7 +39,7 @@ export function AppSidebar({
     },
     {
       title: "Manajemen Antrian",
-      url: "/queue-stage",
+      url: "/stage",
       icon: IconReport,
     },
   ];
