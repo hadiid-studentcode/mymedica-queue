@@ -59,8 +59,6 @@ export default function AdminLayout({
 
   const { user } = session;
 
-  console.log("Tenant:", isTenant);
-
   return (
     <SidebarProvider
       style={
@@ -70,7 +68,7 @@ export default function AdminLayout({
         } as React.CSSProperties
       }
     >
-      <AppSidebar variant="inset" user={user} />
+      <AppSidebar variant="inset" user={user} isTenant={isTenant} />
       <SidebarInset>
         <SiteHeader />
         <div className="flex flex-1 flex-col">

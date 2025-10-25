@@ -21,18 +21,20 @@ import {
 } from "@/components/ui/sidebar";
 import Link from "next/link";
 
-const data = {
+interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
   user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
-  navMain: [
-    {
-      title: "Manajemen Tenant",
-      url: "/tenant",
-      icon: IconDatabase,
-    },
+    name: string;
+    email: string;
+  };
+  isTenant: boolean;
+}
+
+export function AppSidebar({
+  user,
+  isTenant,
+  ...sidebarProps
+}: AppSidebarProps) {
+  const navForTenant = [
     {
       title: "Manajemen Tahapan Antrian",
       url: "#",
@@ -43,20 +45,20 @@ const data = {
       url: "#",
       icon: IconReport,
     },
-  ],
-};
+  ];
 
-interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
-  user: {
-    name: string;
-    email: string;
-  
-  };
-}
+  const navForAdmin = [
+    {
+      title: "Manajemen Tenant",
+      url: "/tenant",
+      icon: IconDatabase,
+    },
+  ];
 
-export function AppSidebar({ ...props} : AppSidebarProps) {
+  const sidebarNav = isTenant ? navForTenant : navForAdmin;
+
   return (
-    <Sidebar collapsible="offcanvas" {...props}>
+    <Sidebar collapsible="offcanvas" {...sidebarProps}>
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
@@ -75,10 +77,10 @@ export function AppSidebar({ ...props} : AppSidebarProps) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
+        <NavMain items={sidebarNav} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={props.user}/>
+        <NavUser user={user} />
       </SidebarFooter>
     </Sidebar>
   );
