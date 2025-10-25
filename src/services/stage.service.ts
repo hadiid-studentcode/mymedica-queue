@@ -55,6 +55,9 @@ export const stageService = {
       orderBy: {
         order: "asc",
       },
+      include: {
+        entries: true,
+      },
     });
   },
 };
