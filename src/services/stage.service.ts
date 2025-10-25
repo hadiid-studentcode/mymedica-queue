@@ -2,6 +2,23 @@ import prisma from "@/lib/prisma";
 
 export const stageService = {
   create: async (name: string, order: number, tenantId: string) => {
+    const stage = await prisma.queueStage.findFirst({
+      where: {
+        order: order,
+        tenantId: tenantId,
+      },
+    });
+
+    if (stage) {
+      return prisma.queueStage.create({
+        data: {
+          name: name,
+          order: order + 1,
+          tenantId: tenantId,
+        },
+      });
+    }
+
     return prisma.queueStage.create({
       data: {
         name: name,
@@ -10,6 +27,7 @@ export const stageService = {
       },
     });
   },
+
   update: async (name: string, order: number, id: string) => {
     return prisma.queueStage.update({
       where: {
