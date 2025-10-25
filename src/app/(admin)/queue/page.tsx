@@ -42,7 +42,7 @@ const stages = [
     patients: [],
   },
   {
-    id : "stage-6",
+    id: "stage-6",
     title: "Ruang Dokter",
     patients: [],
   },
@@ -50,8 +50,7 @@ const stages = [
     id: "stage-7",
     title: "Ruang Dokter",
     patients: [],
-  }
-  
+  },
 ];
 
 function PatientCard({
@@ -115,40 +114,41 @@ export default function QueueDashboardPage() {
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold tracking-tight">Manajemen Antrian</h1>
         <button className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors h-10 px-4 py-2 bg-blue-600 text-white hover:bg-blue-600/90">
-          <Plus className="mr-2 h-4 w-4" />
-          Tambah Pasien
+          <Plus className="mr-2 h-4 w-4" /> Tambah Pasien
         </button>
       </div>
 
-      <div className="flex gap-4 overflow-x-auto pb-4">
-        {stages.map((stage) => (
-          <div
-            key={stage.id}
-            className="min-w-[300px] w-[300px] flex flex-col"
-          >
-            <div className="flex justify-between items-center p-4 rounded-t-lg bg-slate-100 dark:bg-slate-900">
-              <h2 className="font-semibold text-gray-800 dark:text-gray-100">
-                {stage.title}
-              </h2>
-              <span className="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-semibold text-blue-800">
-                {stage.patients.length}
-              </span>
-            </div>
-            <div className="h-1 bg-indigo-600 w-full"></div>
+      <div className="overflow-x-auto">
+        <div className="flex gap-4 pb-4 min-w-max h-[calc(100vh-200px)]">
+          {stages.map((stage) => (
+            <div
+              key={stage.id}
+              className="min-w-[300px] w-[300px] flex flex-col"
+            >
+              <div className="flex justify-between items-center p-4 rounded-t-lg bg-slate-100 dark:bg-slate-900">
+                <h2 className="font-semibold text-gray-800 dark:text-gray-100">
+                  {stage.title}
+                </h2>
+                <span className="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-semibold text-blue-800">
+                  {stage.patients.length}
+                </span>
+              </div>
+              <div className="h-1 bg-indigo-600 w-full"></div>
 
-            <div className="p-4 bg-slate-100/70 dark:bg-slate-900/70 rounded-b-lg space-y-4 min-h-[200px]">
-              {stage.patients.length > 0 ? (
-                stage.patients.map((patient) => (
-                  <PatientCard key={patient.id} patient={patient} />
-                ))
-              ) : (
-                <div className="flex justify-center items-center h-24 text-sm text-gray-500">
-                  Antrian kosong
-                </div>
-              )}
+              <div className="p-4 bg-slate-100/70 dark:bg-slate-900/70 rounded-b-lg space-y-4 flex-1 overflow-y-auto min-h-[200px]">
+                {stage.patients.length > 0 ? (
+                  stage.patients.map((patient) => (
+                    <PatientCard key={patient.id} patient={patient} />
+                  ))
+                ) : (
+                  <div className="flex justify-center items-center h-24 text-sm text-gray-500">
+                    Antrian kosong
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </div>
   );
