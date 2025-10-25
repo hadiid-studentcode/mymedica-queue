@@ -46,13 +46,17 @@ const data = {
   ],
 };
 
+interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
+  user: {
+    name: string;
+    email: string;
+  
+  };
+  logout : () => void
+}
 
-export function AppSidebar({
-
-  ...props }: 
-  React.ComponentProps<typeof Sidebar>,
-
-) {
+export function AppSidebar({ ...props} : AppSidebarProps) {
+  console.log(props.user);
   return (
     <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader>
@@ -76,7 +80,7 @@ export function AppSidebar({
         <NavMain items={data.navMain} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser user={props.user} logout={props.logout} />
       </SidebarFooter>
     </Sidebar>
   );
