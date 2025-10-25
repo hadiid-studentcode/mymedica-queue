@@ -31,6 +31,7 @@ interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
 
 export function AppSidebar({ user, ...sidebarProps }: AppSidebarProps) {
   const { isTenant } = useTenant();
+  console.log(isTenant);
   const navForTenant = [
     {
       title: "Manajemen Tahapan Antrian",

@@ -4,7 +4,7 @@ import { createContext, useContext } from "react";
 
 interface TenantContextType {
   tenantID: string | null;
-  isTenant: boolean;
+  isTenant: boolean | null;
 }
 
 const TenantContext = createContext<TenantContextType>({

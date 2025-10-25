@@ -15,8 +15,8 @@ export default function AdminLayout({
 }) {
   const router = useRouter();
   const { data: session, isPending } = useSession();
-  const [isTenant, setIsTenant] = useState(false);
-  const [tenantID, setTenantID] = useState(null);
+  const [isTenant, setIsTenant] = useState<boolean | null>(null);
+  const [tenantID, setTenantID] = useState<string | null>(null);
 
   const fetchTenant = async (userId: string) => {
     try {
@@ -33,7 +33,10 @@ export default function AdminLayout({
       };
     } catch (error) {
       console.error("Failed to fetch tenant:", error);
-      return null;
+      return {
+        isdata: false,
+        data: null,
+      };
     }
   };
 
@@ -47,12 +50,11 @@ export default function AdminLayout({
 
     (async () => {
       const data = await fetchTenant(session.user.id);
-      if (data?.isdata !== null) {
-        {
-          setIsTenant(true);
-          setTenantID(data?.data.id);
-        }
+      if (data?.isdata === true && data?.data?.id) {
+        setIsTenant(true);
+        setTenantID(data.data.id);
       } else {
+        // Ini akan menangkap { isdata: false } atau jika fetch gagal
         setIsTenant(false);
         setTenantID(null);
       }
@@ -65,6 +67,9 @@ export default function AdminLayout({
     return <p className="text-center mt-8 text-white">Redirecting...</p>;
 
   const { user } = session;
+
+  console.log("tenantID", tenantID);
+  console.log("isTenant", isTenant);
 
   return (
     <TenantProvider value={{ tenantID, isTenant }}>
