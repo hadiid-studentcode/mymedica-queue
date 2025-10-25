@@ -32,7 +32,7 @@ export const tenantService = {
     });
   },
 
-  delete : async (id: string) => {
+  delete: async (id: string) => {
     return prisma.tenant.delete({
       where: {
         id,
@@ -47,5 +47,15 @@ export const tenantService = {
       },
     });
   },
-  
+
+  findByUserId: async (userId: string) => {
+    return prisma.tenant.findFirst({
+      where: {
+        userId: userId,
+      },
+      select: {
+        id: true, 
+      },
+    });
+  },
 };

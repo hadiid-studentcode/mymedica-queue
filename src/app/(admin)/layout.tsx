@@ -1,10 +1,9 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useSession, signOut } from "@/lib/auth-client";
-import { useEffect } from "react";
+import { useSession } from "@/lib/auth-client";
+import { useEffect, useState } from "react";
 import { AppSidebar } from "@/components/app-sidebar";
-
 import { SiteHeader } from "@/components/site-header";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 
@@ -15,11 +14,42 @@ export default function AdminLayout({
 }) {
   const router = useRouter();
   const { data: session, isPending } = useSession();
+  const [isTenant, setIsTenant] = useState(false);
+
+  const fetchTenant = async (userId: string) => {
+    try {
+      const res = await fetch(`/api/tenant/userId`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId }),
+      });
+
+      const result = await res.json();
+      return result.data || null;
+    } catch (error) {
+      console.error("Failed to fetch tenant:", error);
+      return null;
+    }
+  };
 
   useEffect(() => {
-    if (!isPending && !session?.user) {
+    if (isPending) return;
+
+    if (!session?.user) {
       router.push("/sign-in");
+      return;
     }
+
+    (async () => {
+      const data = await fetchTenant(session.user.id);
+      if (data !== null) {
+        {
+          setIsTenant(true);
+        }
+      } else {
+        setIsTenant(false);
+      }
+    })();
   }, [isPending, session, router]);
 
   if (isPending)
@@ -29,28 +59,26 @@ export default function AdminLayout({
 
   const { user } = session;
 
+  console.log("Tenant:", isTenant);
+
   return (
-    <>
-      <SidebarProvider
-        style={
-          {
-            "--sidebar-width": "calc(var(--spacing) * 72)",
-            "--header-height": "calc(var(--spacing) * 12)",
-          } as React.CSSProperties
-        }
-      >
-        <AppSidebar variant="inset" user={user} logout={() => signOut()} />
-        <SidebarInset>
-          <SiteHeader/>
-          <div className="flex flex-1 flex-col">
-            <div className="@container/main flex flex-1 flex-col gap-2">
-              <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
-                {children}
-              </div>
-            </div>
-          </div>
-        </SidebarInset>
-      </SidebarProvider>
-    </>
+    <SidebarProvider
+      style={
+        {
+          "--sidebar-width": "calc(var(--spacing) * 72)",
+          "--header-height": "calc(var(--spacing) * 12)",
+        } as React.CSSProperties
+      }
+    >
+      <AppSidebar variant="inset" user={user} />
+      <SidebarInset>
+        <SiteHeader />
+        <div className="flex flex-1 flex-col">
+          <main className="flex flex-1 flex-col gap-4 py-4 md:gap-6 md:py-6">
+            {children}
+          </main>
+        </div>
+      </SidebarInset>
+    </SidebarProvider>
   );
 }

@@ -25,9 +25,9 @@ export const config = {
   matcher: [
     "/dashboard/:path*",
     "/tenant/:path*",
-    "/api/tenant/:path*",
-    "/api/queue/:path*",
-    "/api/stage/:path*",
-    "/api/send-mail/:path*",
+    // "/api/tenant/:path*",
+    // "/api/queue/:path*",
+    // "/api/stage/:path*",
+    // "/api/send-mail/:path*",
   ],
 };

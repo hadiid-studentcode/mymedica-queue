@@ -23,16 +23,17 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { Button } from "./ui/button";
+import { signOut } from "@/lib/auth-client";
+
 
 export function NavUser({
   user,
-  logout,
+
 }: {
   user: {
     name: string;
     email: string;
   };
-  logout : () => void
 }) {
   const { isMobile } = useSidebar();
 
@@ -86,7 +87,7 @@ export function NavUser({
             <DropdownMenuSeparator />
             <DropdownMenuItem>
               <IconLogout />
-              <Button variant="ghost" onClick={logout}>
+              <Button variant="ghost" onClick={() => signOut()}>
                 Logout
               </Button>
             </DropdownMenuItem>
