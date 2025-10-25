@@ -3,10 +3,9 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
   try {
-    const { patienName, queueNumber, tenantId, currentStageId } =
-      await req.json();
+    const { patienName, queueNumber, tenantId } = await req.json();
 
-    if (!patienName || !queueNumber || !tenantId || !currentStageId) {
+    if (!patienName || !queueNumber || !tenantId) {
       return NextResponse.json({
         message:
           "patienName, queueNumber, tenantId, and currentStageId are required",
@@ -14,11 +13,20 @@ export async function POST(req: NextRequest) {
       });
     }
 
+    const currentStage = await queueService.getStageIdByTenantIdFirst(tenantId);
+
+    if (!currentStage) {
+      return NextResponse.json({
+        message: "Stage not found",
+        status: 404,
+      });
+    }
+
     const data = await queueService.create(
       patienName,
       queueNumber,
       tenantId,
-      currentStageId
+      currentStage?.id
     );
     return NextResponse.json({
       message: "Queue created successfully",

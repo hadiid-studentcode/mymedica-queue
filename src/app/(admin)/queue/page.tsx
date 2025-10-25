@@ -1,7 +1,24 @@
 "use client";
 
-import React from "react";
-import { ArrowRight, Clock, Loader2, Trash2, Plus } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import {
+  ArrowRight,
+  Clock,
+  Loader2,
+  Trash2,
+  CheckCircle2Icon,
+} from "lucide-react";
+
+import { DialogComponent } from "@/components/dialogComponent";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { DialogClose, DialogFooter } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertCircleIcon } from "lucide-react";
+import { SpinnerBadge } from "@/components/spinner-badge";
+import { useTenant } from "@/context/tenantContext";
+import { generateQueueNumber } from "@/lib/utils";
 
 const stages = [
   {
@@ -109,13 +126,135 @@ function PatientCard({
 }
 
 export default function QueueDashboardPage() {
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState(false);
+  const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
+  const { tenantID } = useTenant();
+  const [queue, setQueue] = useState([]);
+
+  const resetAlert = () => {
+    setSuccess(false);
+    setError(false);
+    setMessage("");
+  };
+
+  const fetchQueue = async () => {
+    try {
+      const res = await fetch(`/api/queue?tenantId=${tenantID}`);
+      const json = await res.json();
+      setQueue(json.data || []);
+    } catch (err) {
+      console.log("Failed to fetch queue:", err);
+    }
+  };
+
+  useEffect(() => {
+    const loadQueue = async () => {
+      await fetchQueue();
+    };
+    loadQueue();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    resetAlert();
+    setLoading(true);
+
+    const formData = new FormData(e.currentTarget);
+    const payload = {
+      patienName: formData.get("patienName"),
+      queueNumber: generateQueueNumber("A", 1000),
+      tenantId: tenantID,
+    };
+
+    try {
+      const res = await fetch("/api/queue", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(true);
+        setMessage(data.message || `Request failed with status ${res.status}`);
+        setLoading(false);
+        return;
+      }
+
+      setSuccess(true);
+      setMessage(data.message);
+      setLoading(false);
+      await fetchQueue();
+    } catch (err) {
+      setError(true);
+      setMessage((err as Error).message || "Something went wrong");
+    }
+  };
+
+  console.log(queue);
   return (
     <div className="p-4 md:p-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold tracking-tight">Manajemen Antrian</h1>
-        <button className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors h-10 px-4 py-2 bg-blue-600 text-white hover:bg-blue-600/90">
-          <Plus className="mr-2 h-4 w-4" /> Tambah Pasien
-        </button>
+
+        <DialogComponent
+          variant="default"
+          buttonText="Tambah Pasien"
+          dialogTitle="Tambah Pasien"
+          formDialog={() => {
+            return (
+              <>
+                {error && (
+                  <Alert variant="destructive">
+                    <AlertCircleIcon />
+                    <AlertTitle>Error : {message}</AlertTitle>
+                  </Alert>
+                )}
+
+                {success && (
+                  <Alert className="border-green-500">
+                    <CheckCircle2Icon className="text-green-600" />
+                    <AlertTitle>Success</AlertTitle>
+                    <AlertDescription>{message}</AlertDescription>
+                  </Alert>
+                )}
+
+                {loading && (
+                  <SpinnerBadge
+                    value="Loading..."
+                    variant="outline"
+                    className="text-center mt-3"
+                  />
+                )}
+                <form onSubmit={handleSubmit} method="post">
+                  <div className="grid gap-4 mb-5 mt-3">
+                    <div className="grid gap-3">
+                      <Label htmlFor="patienName">Nama Pasien</Label>
+                      <Input
+                        id="patienName"
+                        name="patienName"
+                        placeholder="john doe"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <DialogFooter>
+                    <DialogClose asChild>
+                      <Button variant="outline" onClick={resetAlert}>
+                        Cancel
+                      </Button>
+                    </DialogClose>
+                    <Button type="submit">Save changes</Button>
+                  </DialogFooter>
+                </form>
+              </>
+            );
+          }}
+        />
       </div>
 
       <div className="overflow-x-auto">

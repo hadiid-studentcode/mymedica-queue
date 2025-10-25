@@ -49,4 +49,14 @@ export const queueService = {
       },
     });
   },
+  getStageIdByTenantIdFirst: async (tenantId: string) => {
+    return prisma.queueStage.findFirst({
+      where: {
+        tenantId: tenantId,
+      },
+      select: {
+        id: true,
+      },
+    });
+  },
 };
