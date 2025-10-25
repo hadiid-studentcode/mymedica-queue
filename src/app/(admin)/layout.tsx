@@ -50,7 +50,7 @@ export default function AdminLayout({
       if (data?.isdata !== null) {
         {
           setIsTenant(true);
-          setTenantID(data?.data);
+          setTenantID(data?.data.id);
         }
       } else {
         setIsTenant(false);

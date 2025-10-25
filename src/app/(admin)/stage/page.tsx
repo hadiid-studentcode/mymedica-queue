@@ -19,22 +19,17 @@ import {
 import { useEffect, useState } from "react";
 import { useTenant } from "@/context/tenantContext";
 
-const stages = [
-  { id: "1", name: "Registrasi" },
-  { id: "2", name: "Poli Umum (Perawat)" },
-  { id: "3", name: "Ruang Dokter" },
-  { id: "4", name: "Farmasi" },
-];
-
 export default function QueueStagePage() {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState(false);
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
-  const [queueStage, setQueueStage] = useState([]);
-  const { tenantID, isTenant } = useTenant();
+  const [queueStage, setQueueStage] = useState<{ id: string; name: string }[]>(
+    []
+  );
+  const { tenantID } = useTenant();
 
-  console.log(tenantID, isTenant);
+  const id = tenantID;
 
   const resetAlert = () => {
     setSuccess(false);
@@ -42,22 +37,21 @@ export default function QueueStagePage() {
     setMessage("");
   };
 
-  const fetchQueueStage = async () => {
-    try {
-      const res = await fetch(`/api/stage?tenantId=${tenantID}`);
-      const json = await res.json();
-      setQueueStage(json.data || []);
-    } catch (err) {
-      console.log("Failed to fetch tenants:", err);
-    }
-  };
-
   useEffect(() => {
-    const loadTenants = async () => {
-      await fetchQueueStage();
+    const fetchQueueStage = async () => {
+      if (!id) return;
+
+      try {
+        const res = await fetch(`/api/stage?tenantId=${id}`);
+        const json = await res.json();
+        setQueueStage(json.data || []);
+      } catch (err) {
+        console.log("Failed to fetch queue stage:", err);
+      }
     };
-    loadTenants();
-  }, []);
+
+    fetchQueueStage();
+  }, [id]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -66,13 +60,13 @@ export default function QueueStagePage() {
 
     const formData = new FormData(e.currentTarget);
     const payload = {
-      tenantName: formData.get("tenant"),
       name: formData.get("name"),
-      email: formData.get("email"),
+      order: Number(formData.get("order")),
+      tenantId: id,
     };
 
     try {
-      const res = await fetch("/api/tenant", {
+      const res = await fetch("/api/stage", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -90,15 +84,18 @@ export default function QueueStagePage() {
       setSuccess(true);
       setMessage(data.message);
       setLoading(false);
+
+      if (id) {
+        fetch(`/api/stage?tenantId=${id}`)
+          .then((res) => res.json())
+          .then((json) => setQueueStage(json.data || []));
+      }
     } catch (err) {
       setError(true);
-      console.log(err);
-      setMessage("Something went wrong");
+      setMessage(`Something went wrong ${(err as Error).message}`);
       setLoading(false);
     }
   };
-
-  console.log(queueStage);
 
   return (
     <div className="w-full max-w-6xl mx-auto p-4 md:p-8">
@@ -106,13 +103,6 @@ export default function QueueStagePage() {
         <h1 className="text-3xl font-bold tracking-tight">
           Kelola Tahapan Antrian (Stages)
         </h1>
-        {success && (
-          <Alert className="border-green-500">
-            <CheckCircle2Icon className="text-green-600" />
-            <AlertTitle>Success</AlertTitle>
-            <AlertDescription>{message}</AlertDescription>
-          </Alert>
-        )}
 
         <DialogComponent
           variant="default"
@@ -150,8 +140,8 @@ export default function QueueStagePage() {
                       <Label htmlFor="oder">Nomor Urut</Label>
                       <Input
                         type="number"
-                        id="oder"
-                        name="oder"
+                        id="order"
+                        name="order"
                         placeholder="1"
                         required
                       />
@@ -172,44 +162,58 @@ export default function QueueStagePage() {
         />
       </div>
 
+      {success && (
+        <Alert className="border-green-500 mb-5">
+          <CheckCircle2Icon className="text-green-600" />
+          <AlertTitle>Success</AlertTitle>
+          <AlertDescription>{message}</AlertDescription>
+        </Alert>
+      )}
+
       <Card>
         <CardContent className="pt-6">
           <div className="flex flex-col gap-4">
-            {stages.map((stage) => (
-              <div
-                key={stage.id}
-                className="flex items-center gap-3 p-4 border rounded-lg bg-white"
-              >
-                <span className="flex-1 text-base font-medium">
-                  {stage.name}
-                </span>
+            {queueStage.length > 0 ? (
+              queueStage.map((stage) => (
+                <div
+                  key={stage.id}
+                  className="flex items-center gap-3 p-4 border rounded-lg bg-white"
+                >
+                  <span className="flex-1 text-base font-medium">
+                    {stage.name}
+                  </span>
 
-                <div className="flex items-center gap-1">
-                  <Button variant="ghost" size="icon" aria-label="Move up">
-                    <ChevronUp className="h-4 w-4" />
-                  </Button>
-                  <Button variant="ghost" size="icon" aria-label="Move down">
-                    <ChevronDown className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="text-blue-600 hover:text-blue-700"
-                    aria-label="Edit stage"
-                  >
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="text-red-600 hover:text-red-700"
-                    aria-label="Delete stage"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
+                  <div className="flex items-center gap-1">
+                    <Button variant="ghost" size="icon" aria-label="Move up">
+                      <ChevronUp className="h-4 w-4" />
+                    </Button>
+                    <Button variant="ghost" size="icon" aria-label="Move down">
+                      <ChevronDown className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="text-blue-600 hover:text-blue-700"
+                      aria-label="Edit stage"
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="text-red-600 hover:text-red-700"
+                      aria-label="Delete stage"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))
+            ) : (
+              <p className="text-center text-gray-500">
+                Belum ada tahapan antrian. Silakan tambahkan.
+              </p>
+            )}
           </div>
         </CardContent>
       </Card>
