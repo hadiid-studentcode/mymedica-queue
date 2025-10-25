@@ -13,8 +13,7 @@ import {
   CheckCircle2Icon,
   ChevronDown,
   ChevronUp,
-  Pencil,
-  Trash2,
+
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTenant } from "@/context/tenantContext";
@@ -24,12 +23,11 @@ export default function QueueStagePage() {
   const [error, setError] = useState(false);
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
-  const [queueStage, setQueueStage] = useState<{ id: string; name: string }[]>(
+  const [queueStage, setQueueStage] = useState<{ id: string; name: string, order: number }[]>(
     []
   );
   const { tenantID } = useTenant();
 
-  const id = tenantID;
 
   const resetAlert = () => {
     setSuccess(false);
@@ -39,10 +37,10 @@ export default function QueueStagePage() {
 
   useEffect(() => {
     const fetchQueueStage = async () => {
-      if (!id) return;
+      if (!tenantID) return;
 
       try {
-        const res = await fetch(`/api/stage?tenantId=${id}`);
+        const res = await fetch(`/api/stage?tenantId=${tenantID}`);
         const json = await res.json();
         setQueueStage(json.data || []);
       } catch (err) {
@@ -51,7 +49,7 @@ export default function QueueStagePage() {
     };
 
     fetchQueueStage();
-  }, [id]);
+  }, [tenantID]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -62,7 +60,7 @@ export default function QueueStagePage() {
     const payload = {
       name: formData.get("name"),
       order: Number(formData.get("order")),
-      tenantId: id,
+      tenantId: tenantID,
     };
 
     try {
@@ -85,8 +83,8 @@ export default function QueueStagePage() {
       setMessage(data.message);
       setLoading(false);
 
-      if (id) {
-        fetch(`/api/stage?tenantId=${id}`)
+      if (tenantID) {
+        fetch(`/api/stage?tenantId=${tenantID}`)
           .then((res) => res.json())
           .then((json) => setQueueStage(json.data || []));
       }
@@ -129,6 +127,51 @@ export default function QueueStagePage() {
     }
   };
 
+  const handleUpdate = async (id: string, e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    resetAlert();
+    setLoading(true);
+
+    const formData = new FormData(e.currentTarget);
+    const payload = {
+      name: formData.get("name"),
+      order: Number(formData.get("order")),
+      tenantId: tenantID,
+    };
+
+    try {
+      const res = await fetch(`/api/stage/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json();
+
+      if(!res.ok){
+        setError(true);
+        setMessage(data.message || `Request failed with status ${res.status}`);
+        setLoading(false);
+        return;
+      }
+
+      setSuccess(true);
+      setMessage(data.message);
+      setLoading(false);
+
+      if(tenantID){
+        fetch(`/api/stage?tenantId=${tenantID}`)
+          .then((res) => res.json())
+          .then((json) => setQueueStage(json.data || []));
+      }
+
+    } catch (err) {
+        setError(true);
+        setMessage(`Something went wrong ${(err as Error).message}`);
+        setLoading(false);
+    }
+  }
+
   return (
     <div className="w-full max-w-6xl mx-auto p-4 md:p-8">
       <div className="flex justify-between items-center mb-6">
@@ -169,7 +212,7 @@ export default function QueueStagePage() {
                       />
                     </div>
                     <div className="grid gap-3">
-                      <Label htmlFor="oder">Nomor Urut</Label>
+                      <Label htmlFor="order">Nomor Urut</Label>
                       <Input
                         type="number"
                         id="order"
@@ -211,6 +254,7 @@ export default function QueueStagePage() {
                   key={stage.id}
                   className="flex items-center gap-3 p-4 border rounded-lg bg-white"
                 >
+               
                   <span className="flex-1 text-base font-medium">
                     {stage.name}
                   </span>
@@ -222,22 +266,78 @@ export default function QueueStagePage() {
                     <Button variant="ghost" size="icon" aria-label="Move down">
                       <ChevronDown className="h-4 w-4" />
                     </Button>
+                    <DialogComponent
+                      variant="outline"
+                      buttonText="Edit Stage"
+                      dialogTitle="Edit Stage"
+                      formDialog={() => {
+                        return (
+                          <>
+                            {error && (
+                              <Alert variant="destructive">
+                                <AlertCircleIcon />
+                                <AlertTitle>Error : {message}</AlertTitle>
+                              </Alert>
+                            )}
+
+                            {loading && (
+                              <SpinnerBadge
+                                value="Loading..."
+                                variant="outline"
+                                className="text-center mt-3"
+                              />
+                            )}
+                            <form
+                              onSubmit={(e) => handleUpdate(stage.id, e)}
+                            method="post"
+                            >
+                              <div className="grid gap-4 mb-5 mt-3">
+                                <div className="grid gap-3">
+                                  <Label htmlFor="name">Nama Tahapan</Label>
+                                  <Input
+                                    id="name"
+                                    name="name"
+                                    placeholder="Contoh : Poli Umum"
+                                    required
+                                    defaultValue={stage.name}
+                                  />
+                                </div>
+                                <div className="grid gap-3">
+                                  <Label htmlFor="oder">Nomor Urut</Label>
+                                  <Input
+                                    type="number"
+                                    id="order"
+                                    name="order"
+                                    placeholder="1"
+                                    required
+                                    defaultValue={stage.order}
+                                  />
+                                </div>
+                              </div>
+                              <DialogFooter>
+                                <DialogClose asChild>
+                                  <Button
+                                    variant="outline"
+                                    onClick={resetAlert}
+                                  >
+                                    Cancel
+                                  </Button>
+                                </DialogClose>
+                                <Button type="submit">Save changes</Button>
+                              </DialogFooter>
+                            </form>
+                          </>
+                        );
+                      }}
+                    />
                     <Button
                       variant="ghost"
-                      size="icon"
-                      className="text-blue-600 hover:text-blue-700"
-                      aria-label="Edit stage"
-                    >
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="text-red-600 hover:text-red-700"
+                      size="default"
+                      className="text-white hover:text-white-700 bg-red-500 hover:bg-red-400"
                       aria-label="Delete stage"
                       onClick={() => handleDelete(stage.id)}
                     >
-                      <Trash2 className="h-4 w-4" />
+                      Delete
                     </Button>
                   </div>
                 </div>
