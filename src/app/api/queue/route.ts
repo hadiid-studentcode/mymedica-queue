@@ -32,3 +32,29 @@ export async function POST(req: NextRequest) {
     });
   }
 }
+
+export async function GET(req: NextRequest) {
+  try {
+    const { searchParams } = new URL(req.url);
+    const tenantId = searchParams.get("tenantId");
+
+    if (!tenantId) {
+      return NextResponse.json({
+        message: "tenantId is required",
+        status: 400,
+      });
+    }
+
+    const data = await queueService.viewActiveQueue(tenantId);
+    return NextResponse.json({
+      message: "success",
+      data: data,
+      status: 200,
+    });
+  } catch (error) {
+    return NextResponse.json({
+      message: `Internal Server Error : ${error}`,
+      status: 500,
+    });
+  }
+}

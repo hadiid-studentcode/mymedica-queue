@@ -43,7 +43,9 @@ export const queueService = {
     return prisma.queueEntry.findMany({
       where: {
         tenantId: tenantId,
-        status: Status.IN_PROGRESS || Status.WAITING,
+        status: {
+          in: [Status.IN_PROGRESS, Status.WAITING],
+        },
       },
     });
   },
