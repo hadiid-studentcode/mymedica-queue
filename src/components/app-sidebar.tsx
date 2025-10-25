@@ -35,7 +35,7 @@ export function AppSidebar({ user, ...sidebarProps }: AppSidebarProps) {
   const navForTenant = [
     {
       title: "Manajemen Tahapan Antrian",
-      url: "#",
+      url: "/queue",
       icon: IconListDetails,
     },
     {
