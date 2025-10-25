@@ -42,7 +42,7 @@ export function AppSidebar({
     },
     {
       title: "Manajemen Antrian",
-      url: "#",
+      url: "/queue-stage",
       icon: IconReport,
     },
   ];
