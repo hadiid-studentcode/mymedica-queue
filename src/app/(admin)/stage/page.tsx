@@ -13,7 +13,6 @@ import {
   CheckCircle2Icon,
   ChevronDown,
   ChevronUp,
-
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTenant } from "@/context/tenantContext";
@@ -23,11 +22,10 @@ export default function QueueStagePage() {
   const [error, setError] = useState(false);
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
-  const [queueStage, setQueueStage] = useState<{ id: string; name: string, order: number }[]>(
-    []
-  );
+  const [queueStage, setQueueStage] = useState<
+    { id: string; name: string; order: number }[]
+  >([]);
   const { tenantID } = useTenant();
-
 
   const resetAlert = () => {
     setSuccess(false);
@@ -127,7 +125,10 @@ export default function QueueStagePage() {
     }
   };
 
-  const handleUpdate = async (id: string, e: React.FormEvent<HTMLFormElement>) => {
+  const handleUpdate = async (
+    id: string,
+    e: React.FormEvent<HTMLFormElement>
+  ) => {
     e.preventDefault();
     resetAlert();
     setLoading(true);
@@ -148,7 +149,7 @@ export default function QueueStagePage() {
 
       const data = await res.json();
 
-      if(!res.ok){
+      if (!res.ok) {
         setError(true);
         setMessage(data.message || `Request failed with status ${res.status}`);
         setLoading(false);
@@ -159,18 +160,19 @@ export default function QueueStagePage() {
       setMessage(data.message);
       setLoading(false);
 
-      if(tenantID){
+      if (tenantID) {
         fetch(`/api/stage?tenantId=${tenantID}`)
           .then((res) => res.json())
           .then((json) => setQueueStage(json.data || []));
       }
-
     } catch (err) {
-        setError(true);
-        setMessage(`Something went wrong ${(err as Error).message}`);
-        setLoading(false);
+      setError(true);
+      setMessage(`Something went wrong ${(err as Error).message}`);
+      setLoading(false);
     }
-  }
+  };
+
+
 
   return (
     <div className="w-full max-w-6xl mx-auto p-4 md:p-8">
@@ -254,18 +256,13 @@ export default function QueueStagePage() {
                   key={stage.id}
                   className="flex items-center gap-3 p-4 border rounded-lg bg-white"
                 >
-               
                   <span className="flex-1 text-base font-medium">
                     {stage.name}
                   </span>
 
                   <div className="flex items-center gap-1">
-                    <Button variant="ghost" size="icon" aria-label="Move up">
-                      <ChevronUp className="h-4 w-4" />
-                    </Button>
-                    <Button variant="ghost" size="icon" aria-label="Move down">
-                      <ChevronDown className="h-4 w-4" />
-                    </Button>
+               
+
                     <DialogComponent
                       variant="outline"
                       buttonText="Edit Stage"
@@ -289,7 +286,7 @@ export default function QueueStagePage() {
                             )}
                             <form
                               onSubmit={(e) => handleUpdate(stage.id, e)}
-                            method="post"
+                              method="post"
                             >
                               <div className="grid gap-4 mb-5 mt-3">
                                 <div className="grid gap-3">
