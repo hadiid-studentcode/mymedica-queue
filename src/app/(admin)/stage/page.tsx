@@ -97,6 +97,39 @@ export default function QueueStagePage() {
     }
   };
 
+  const handleDelete = async (id: string) => {
+    resetAlert();
+    setLoading(true);
+
+    try {
+      const res = await fetch(`/api/stage/${id}`, {
+        method: "DELETE",
+      });
+
+      const data = await res.json();
+      console.log(data);
+
+      if (!res.ok) {
+        throw new Error(
+          data.message || `Request failed with status ${res.status}`
+        );
+      }
+
+      setSuccess(true);
+      setMessage(data.message);
+      await fetch(`/api/stage?tenantId=${id}`)
+        .then((res) => res.json())
+        .then((json) => setQueueStage(json.data || []));
+    } catch (err) {
+      setError(true);
+      console.error("Failed to delete stage:", err);
+      setMessage((err as Error).message || "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
   return (
     <div className="w-full max-w-6xl mx-auto p-4 md:p-8">
       <div className="flex justify-between items-center mb-6">
@@ -203,6 +236,7 @@ export default function QueueStagePage() {
                       size="icon"
                       className="text-red-600 hover:text-red-700"
                       aria-label="Delete stage"
+                      onClick={() => handleDelete(stage.id)}
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
