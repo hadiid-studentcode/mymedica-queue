@@ -57,15 +57,4 @@ export const stageService = {
       },
     });
   },
-
-  up: async (order: number, id: string) => {
-    return prisma.queueStage.update({
-      where: {
-        id,
-      },
-      data: {
-        order: order,
-      },
-    });
-  },
 };
