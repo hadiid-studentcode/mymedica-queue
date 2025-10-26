@@ -18,7 +18,7 @@ export const queueService = {
     });
   },
 
-  moveToNextStage: async (queueEntryId: string) => {
+  moveToProgressStage: async (queueEntryId: string) => {
     return prisma.queueEntry.update({
       where: {
         id: queueEntryId,
@@ -36,6 +36,52 @@ export const queueService = {
       data: {
         status: Status.COMPLETED,
       },
+    });
+  },
+  moveToNextStage: async (id: string) => {
+    return prisma.$transaction(async (tx) => {
+      const currentEntry = await tx.queueEntry.findUnique({
+        where: {
+          id: id,
+        },
+        include: {
+          currentStage: {
+            select: { order: true },
+          },
+        },
+      });
+
+      if (!currentEntry) {
+        throw new Error("Entri antrian tidak ditemukan.");
+      }
+
+      const nextStage = await tx.queueStage.findFirst({
+        where: {
+          tenantId: currentEntry.tenantId,
+          order: currentEntry.currentStage.order + 1,
+        },
+      });
+
+      if (nextStage) {
+        return tx.queueEntry.update({
+          where: {
+            id: id,
+          },
+          data: {
+            currentStageId: nextStage.id,
+            status: Status.WAITING,
+          },
+        });
+      } else {
+        return tx.queueEntry.update({
+          where: {
+            id: id,
+          },
+          data: {
+            status: Status.COMPLETED,
+          },
+        });
+      }
     });
   },
 
@@ -63,6 +109,16 @@ export const queueService = {
     return prisma.queueEntry.delete({
       where: {
         id,
+      },
+    });
+  },
+  updateStatus: async (status: Status, id: string) => {
+    return prisma.queueEntry.update({
+      where: {
+        id,
+      },
+      data: {
+        status: status,
       },
     });
   },

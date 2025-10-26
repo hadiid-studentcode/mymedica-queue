@@ -12,7 +12,7 @@ export async function PUT(req: NextRequest) {
       });
     }
 
-    const data = await queueService.moveToNextStage(queueEntryId);
+    const data = await queueService.moveToProgressStage(queueEntryId);
     return NextResponse.json({
       message: "success",
       data: data,

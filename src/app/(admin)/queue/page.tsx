@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+
 import {
   ArrowRight,
   Clock,
@@ -10,48 +11,71 @@ import {
 } from "lucide-react";
 
 import { DialogComponent } from "@/components/dialogComponent";
+
 import { Input } from "@/components/ui/input";
+
 import { Label } from "@/components/ui/label";
+
 import { DialogClose, DialogFooter } from "@/components/ui/dialog";
+
 import { Button } from "@/components/ui/button";
+
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+
 import { AlertCircleIcon } from "lucide-react";
+
 import { SpinnerBadge } from "@/components/spinner-badge";
+
 import { useTenant } from "@/context/tenantContext";
+
 import { generateQueueNumber } from "@/lib/utils";
 
 type queueStages = {
   id: string;
+
   name: string;
+
   order: number;
+
   entries: {
     id: string;
+
     patientName: string;
+
     status: string;
   }[];
 };
 
-
 function PatientCard({
   entrie,
   handleDelete,
+  handleMoveToNextStage,
+  handleMarkInProgress,
+  handleMarkCompleted,
 }: {
   entrie: { id: string; patientName: string; status: string };
   handleDelete: (id: string) => void;
+  handleMoveToNextStage: (id: string) => void;
+  handleMarkInProgress: (id: string) => void;
+  handleMarkCompleted: (id: string) => void;
 }) {
   const isWaiting = entrie.status === "WAITING";
   const isInProgress = entrie.status === "IN_PROGRESS";
-
+  const isCompleted = entrie.status === "COMPLETED";
   return (
     <div className="rounded-lg border bg-white text-slate-900 shadow-md dark:bg-slate-950 dark:border-slate-800 dark:text-slate-50">
       <div className="flex flex-row items-center justify-between p-4 pb-2">
         <h3 className="text-base font-bold tracking-tight">
           {entrie.patientName}
         </h3>
-        <button className="inline-flex items-center justify-center rounded-md h-8 w-8 text-sm font-medium hover:bg-slate-100 dark:hover:bg-slate-800" onClick={() => handleDelete(entrie.id)}>
+        <button
+          className="inline-flex items-center justify-center rounded-md h-8 w-8 text-sm font-medium hover:bg-slate-100 dark:hover:bg-slate-800"
+          onClick={() => handleDelete(entrie.id)}
+        >
           <Trash2 className="h-4 w-4 text-gray-500" />
         </button>
       </div>
+
       <div className="p-4 pt-2 pb-4">
         {isWaiting && (
           <span className="inline-flex items-center rounded-full border border-yellow-200 bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-800">
@@ -65,26 +89,40 @@ function PatientCard({
             DIPROSES
           </span>
         )}
+        {isCompleted && (
+          <span className="inline-flex items-center rounded-full border border-green-200 bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">
+            <CheckCircle2Icon className="mr-1.5 h-3 w-3" />
+            SELESAI
+          </span>
+        )}
       </div>
+
       <div className="flex items-center gap-2 p-4 pt-0">
-        {isWaiting ? (
-          <>
-            <button className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors h-9 px-3 flex-1 bg-blue-600 text-white hover:bg-blue-600/90">
-              Proses
-            </button>
-            <button className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors h-9 px-3 flex-1 bg-slate-200 text-slate-900 hover:bg-slate-200/80 dark:bg-slate-800 dark:text-slate-50">
-              Pindah <ArrowRight className="ml-1.5 h-4 w-4" />
-            </button>
-          </>
-        ) : (
-          <>
-            <button className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors h-9 px-3 flex-1 bg-orange-500 text-white hover:bg-orange-600">
-              Kembalikan
-            </button>
-            <button className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors h-9 px-3 flex-1 bg-gray-700 text-white hover:bg-gray-800">
-              Pindah <ArrowRight className="ml-1.5 h-4 w-4" />
-            </button>
-          </>
+        {isWaiting && (
+          <button
+            className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors h-9 px-3 flex-1 bg-blue-600 text-white hover:bg-blue-600/90"
+            onClick={() => handleMarkInProgress(entrie.id)}
+          >
+            Proses
+          </button>
+        )}
+
+        {isInProgress && (
+          <button
+            className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors h-9 px-3 flex-1 bg-green-600 text-white hover:bg-green-600/90"
+            onClick={() => handleMarkCompleted(entrie.id)}
+          >
+            Selesai
+          </button>
+        )}
+
+        {isCompleted && (
+          <button
+            className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors h-9 px-3 flex-1 bg-slate-200 text-slate-900 hover:bg-slate-200/80 dark:bg-slate-800 dark:text-slate-50"
+            onClick={() => handleMoveToNextStage(entrie.id)}
+          >
+            Pindah <ArrowRight className="ml-1.5 h-4 w-4" />
+          </button>
         )}
       </div>
     </div>
@@ -107,11 +145,17 @@ export default function QueueDashboardPage() {
 
   const fetchQueueStages = async () => {
     try {
+      // Set loading di sini agar ada feedback saat refresh
+      // setLoading(true);
       const res = await fetch(`/api/stage?tenantId=${tenantID}`);
       const json = await res.json();
       setQueueStages(json.data || []);
     } catch (err) {
       console.log("Failed to fetch queue stages:", err);
+      setError(true);
+      setMessage("Gagal memuat data antrian.");
+    } finally {
+      // setLoading(false);
     }
   };
 
@@ -121,7 +165,7 @@ export default function QueueDashboardPage() {
     };
     loadQueueStages();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [tenantID]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -145,33 +189,32 @@ export default function QueueDashboardPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(true);
-        setMessage(data.message || `Request failed with status ${res.status}`);
-        setLoading(false);
-        return;
+        throw new Error(
+          data.message || `Request failed with status ${res.status}`
+        );
       }
 
       setSuccess(true);
       setMessage(data.message);
-      setLoading(false);
       await fetchQueueStages();
     } catch (err) {
       setError(true);
       setMessage((err as Error).message || "Something went wrong");
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleDelete = async (id: string) => {
     resetAlert();
-    setLoading(true);
 
+    setLoading(true);
     try {
       const res = await fetch(`/api/queue/${id}`, {
         method: "DELETE",
       });
 
       const data = await res.json();
-      console.log(data);
 
       if (!res.ok) {
         throw new Error(
@@ -186,6 +229,77 @@ export default function QueueDashboardPage() {
       setError(true);
       console.error("Failed to delete queue:", err);
       setMessage((err as Error).message || "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleUpdateStatus = async (
+    id: string,
+    status: "IN_PROGRESS" | "COMPLETED"
+  ) => {
+    resetAlert();
+    setLoading(true);
+
+    try {
+      const res = await fetch(`/api/queue/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          status: status,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(
+          data.message || `Request failed with status ${res.status}`
+        );
+      }
+
+      setSuccess(true);
+      setMessage(data.message || "Status berhasil diupdate");
+      await fetchQueueStages();
+    } catch (error) {
+      console.error("Failed to update status:", error);
+      setError(true);
+      setMessage((error as Error).message || "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleMarkInProgress = (id: string) => {
+    handleUpdateStatus(id, "IN_PROGRESS");
+  };
+
+  const handleMarkCompleted = (id: string) => {
+    handleUpdateStatus(id, "COMPLETED");
+  };
+
+  const handleMoveToNextStage = async (id: string) => {
+    resetAlert();
+    setLoading(true);
+
+    try {
+      const res = await fetch(`/api/queue/${id}/move`, {
+        method: "POST",
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(
+          data.message || `Request failed with status ${res.status}`
+        );
+      }
+
+      setSuccess(true);
+      setMessage(data.message || "Antrian berhasil dipindah");
+      await fetchQueueStages();
+    } catch (error) {
+      console.error("Failed to move to next stage:", error);
+      setError(true);
+      setMessage((error as Error).message || "Something went wrong");
     } finally {
       setLoading(false);
     }
@@ -273,7 +387,14 @@ export default function QueueDashboardPage() {
               <div className="p-4 bg-slate-100/70 dark:bg-slate-900/70 rounded-b-lg space-y-4 flex-1 overflow-y-auto min-h-[200px]">
                 {stage.entries.length > 0 ? (
                   stage.entries.map((entrie) => (
-                    <PatientCard key={entrie.id} entrie={entrie} handleDelete={handleDelete} />
+                    <PatientCard
+                      key={entrie.id}
+                      entrie={entrie}
+                      handleDelete={handleDelete}
+                      handleMoveToNextStage={handleMoveToNextStage}
+                      handleMarkInProgress={handleMarkInProgress}
+                      handleMarkCompleted={handleMarkCompleted}
+                    />
                   ))
                 ) : (
                   <div className="flex justify-center items-center h-24 text-sm text-gray-500">
