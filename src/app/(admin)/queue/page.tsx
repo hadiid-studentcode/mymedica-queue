@@ -194,6 +194,22 @@ export default function QueueDashboardPage() {
         );
       }
 
+      const send = await fetch("/api/send-mail", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          to: process.env.NEXT_PUBLIC_EMAIL_TO,
+          subject: "Pemberitahuan Antrian",
+          message: "Ada pasien baru mendaftar antrean",
+        }),
+      });
+
+      if (!send.ok) {
+        throw new Error(
+          data.message || `Request failed with status ${res.status}`
+        );
+      }
+
       setSuccess(true);
       setMessage(data.message);
       await fetchQueueStages();
@@ -305,7 +321,6 @@ export default function QueueDashboardPage() {
     }
   };
 
-  console.log(queueStages);
   return (
     <div className="p-4 md:p-6">
       <div className="flex justify-between items-center mb-6">
