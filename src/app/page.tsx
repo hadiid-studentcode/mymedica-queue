@@ -1,21 +1,14 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export default function Home() {
   const router = useRouter();
 
-  return (
-    <main className="flex items-center justify-center h-screen bg-neutral-950 text-white">
-      <div className="flex gap-4">
-       
-        <button
-          onClick={() => router.push("/sign-in")}
-          className="border border-white text-white font-medium px-6 py-2 rounded-md hover:bg-neutral-800"
-        >
-          Sign In
-        </button>
-      </div>
-    </main>
-  );
+  useEffect(() => {
+    router.push("/sign-in");
+  }, [router]);
+
+  return <></>;
 }
