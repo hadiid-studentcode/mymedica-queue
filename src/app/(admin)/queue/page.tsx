@@ -31,55 +31,6 @@ type queueStages = {
   }[];
 };
 
-// const stages = [
-//   {
-//     id: "stage-1",
-//     title: "Registrasi",
-//     patients: [
-//       {
-//         id: "pat-1",
-//         name: "Ahmad Dhani",
-//         status: "waiting",
-//       },
-//     ],
-//   },
-//   {
-//     id: "stage-2",
-//     title: "Poli Umum (Perawat)",
-//     patients: [],
-//   },
-//   {
-//     id: "stage-3",
-//     title: "Ruang Dokter",
-//     patients: [
-//       {
-//         id: "pat-2",
-//         name: "Ani Yudhoyono",
-//         status: "in_progress",
-//       },
-//     ],
-//   },
-//   {
-//     id: "stage-4",
-//     title: "Farmasi",
-//     patients: [],
-//   },
-//   {
-//     id: "stage-5",
-//     title: "KASIR",
-//     patients: [],
-//   },
-//   {
-//     id: "stage-6",
-//     title: "Ruang Dokter",
-//     patients: [],
-//   },
-//   {
-//     id: "stage-7",
-//     title: "Ruang Dokter",
-//     patients: [],
-//   },
-// ];
 
 function PatientCard({
   entrie,
