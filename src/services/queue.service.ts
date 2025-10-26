@@ -59,4 +59,11 @@ export const queueService = {
       },
     });
   },
+  delete: async (id: string) => {
+    return prisma.queueEntry.delete({
+      where: {
+        id,
+      },
+    });
+  },
 };

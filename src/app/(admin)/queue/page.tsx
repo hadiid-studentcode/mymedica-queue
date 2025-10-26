@@ -83,8 +83,10 @@ type queueStages = {
 
 function PatientCard({
   entrie,
+  handleDelete,
 }: {
   entrie: { id: string; patientName: string; status: string };
+  handleDelete: (id: string) => void;
 }) {
   const isWaiting = entrie.status === "WAITING";
   const isInProgress = entrie.status === "IN_PROGRESS";
@@ -95,7 +97,7 @@ function PatientCard({
         <h3 className="text-base font-bold tracking-tight">
           {entrie.patientName}
         </h3>
-        <button className="inline-flex items-center justify-center rounded-md h-8 w-8 text-sm font-medium hover:bg-slate-100 dark:hover:bg-slate-800">
+        <button className="inline-flex items-center justify-center rounded-md h-8 w-8 text-sm font-medium hover:bg-slate-100 dark:hover:bg-slate-800" onClick={() => handleDelete(entrie.id)}>
           <Trash2 className="h-4 w-4 text-gray-500" />
         </button>
       </div>
@@ -137,8 +139,6 @@ function PatientCard({
     </div>
   );
 }
-
-
 
 export default function QueueDashboardPage() {
   const [success, setSuccess] = useState(false);
@@ -207,6 +207,36 @@ export default function QueueDashboardPage() {
     } catch (err) {
       setError(true);
       setMessage((err as Error).message || "Something went wrong");
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    resetAlert();
+    setLoading(true);
+
+    try {
+      const res = await fetch(`/api/queue/${id}`, {
+        method: "DELETE",
+      });
+
+      const data = await res.json();
+      console.log(data);
+
+      if (!res.ok) {
+        throw new Error(
+          data.message || `Request failed with status ${res.status}`
+        );
+      }
+
+      setSuccess(true);
+      setMessage(data.message);
+      await fetchQueueStages();
+    } catch (err) {
+      setError(true);
+      console.error("Failed to delete queue:", err);
+      setMessage((err as Error).message || "Something went wrong");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -292,7 +322,7 @@ export default function QueueDashboardPage() {
               <div className="p-4 bg-slate-100/70 dark:bg-slate-900/70 rounded-b-lg space-y-4 flex-1 overflow-y-auto min-h-[200px]">
                 {stage.entries.length > 0 ? (
                   stage.entries.map((entrie) => (
-                    <PatientCard key={entrie.id} entrie={entrie} />
+                    <PatientCard key={entrie.id} entrie={entrie} handleDelete={handleDelete} />
                   ))
                 ) : (
                   <div className="flex justify-center items-center h-24 text-sm text-gray-500">
