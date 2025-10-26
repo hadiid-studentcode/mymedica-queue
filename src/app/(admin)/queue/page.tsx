@@ -194,7 +194,7 @@ export default function QueueDashboardPage() {
         );
       }
 
-      const send = await fetch("/api/send-mail", {
+    await fetch("/api/send-mail", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -204,11 +204,6 @@ export default function QueueDashboardPage() {
         }),
       });
 
-      if (!send.ok) {
-        throw new Error(
-          data.message || `Request failed with status ${res.status}`
-        );
-      }
 
       setSuccess(true);
       setMessage(data.message);

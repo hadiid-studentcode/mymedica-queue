@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { data, error } = await resend.emails.send({
+    const { data } = await resend.emails.send({
       from: process.env.EMAIL_FROM!,
       to,
       subject,
@@ -49,12 +49,7 @@ export async function POST(req: NextRequest) {
   `,
     });
 
-    if (error) {
-      return NextResponse.json(
-        { message: "Failed to send email", error },
-        { status: 500 }
-      );
-    }
+   
 
     return NextResponse.json(
       { message: "Email sent successfully", data },
