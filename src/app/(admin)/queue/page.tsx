@@ -20,68 +20,81 @@ import { SpinnerBadge } from "@/components/spinner-badge";
 import { useTenant } from "@/context/tenantContext";
 import { generateQueueNumber } from "@/lib/utils";
 
-const stages = [
-  {
-    id: "stage-1",
-    title: "Registrasi",
-    patients: [
-      {
-        id: "pat-1",
-        name: "Ahmad Dhani",
-        status: "waiting",
-      },
-    ],
-  },
-  {
-    id: "stage-2",
-    title: "Poli Umum (Perawat)",
-    patients: [],
-  },
-  {
-    id: "stage-3",
-    title: "Ruang Dokter",
-    patients: [
-      {
-        id: "pat-2",
-        name: "Ani Yudhoyono",
-        status: "in_progress",
-      },
-    ],
-  },
-  {
-    id: "stage-4",
-    title: "Farmasi",
-    patients: [],
-  },
-  {
-    id: "stage-5",
-    title: "KASIR",
-    patients: [],
-  },
-  {
-    id: "stage-6",
-    title: "Ruang Dokter",
-    patients: [],
-  },
-  {
-    id: "stage-7",
-    title: "Ruang Dokter",
-    patients: [],
-  },
-];
+type queueStages = {
+  id: string;
+  name: string;
+  order: number;
+  entries: {
+    id: string;
+    patientName: string;
+    status: string;
+  }[];
+};
+
+// const stages = [
+//   {
+//     id: "stage-1",
+//     title: "Registrasi",
+//     patients: [
+//       {
+//         id: "pat-1",
+//         name: "Ahmad Dhani",
+//         status: "waiting",
+//       },
+//     ],
+//   },
+//   {
+//     id: "stage-2",
+//     title: "Poli Umum (Perawat)",
+//     patients: [],
+//   },
+//   {
+//     id: "stage-3",
+//     title: "Ruang Dokter",
+//     patients: [
+//       {
+//         id: "pat-2",
+//         name: "Ani Yudhoyono",
+//         status: "in_progress",
+//       },
+//     ],
+//   },
+//   {
+//     id: "stage-4",
+//     title: "Farmasi",
+//     patients: [],
+//   },
+//   {
+//     id: "stage-5",
+//     title: "KASIR",
+//     patients: [],
+//   },
+//   {
+//     id: "stage-6",
+//     title: "Ruang Dokter",
+//     patients: [],
+//   },
+//   {
+//     id: "stage-7",
+//     title: "Ruang Dokter",
+//     patients: [],
+//   },
+// ];
 
 function PatientCard({
-  patient,
+  entrie,
 }: {
-  patient: { id: string; name: string; status: string };
+  entrie: { id: string; patientName: string; status: string };
 }) {
-  const isWaiting = patient.status === "waiting";
-  const isInProgress = patient.status === "in_progress";
+  const isWaiting = entrie.status === "WAITING";
+  const isInProgress = entrie.status === "IN_PROGRESS";
 
   return (
     <div className="rounded-lg border bg-white text-slate-900 shadow-md dark:bg-slate-950 dark:border-slate-800 dark:text-slate-50">
       <div className="flex flex-row items-center justify-between p-4 pb-2">
-        <h3 className="text-base font-bold tracking-tight">{patient.name}</h3>
+        <h3 className="text-base font-bold tracking-tight">
+          {entrie.patientName}
+        </h3>
         <button className="inline-flex items-center justify-center rounded-md h-8 w-8 text-sm font-medium hover:bg-slate-100 dark:hover:bg-slate-800">
           <Trash2 className="h-4 w-4 text-gray-500" />
         </button>
@@ -125,13 +138,15 @@ function PatientCard({
   );
 }
 
+
+
 export default function QueueDashboardPage() {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState(false);
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const { tenantID } = useTenant();
-  const [queue, setQueue] = useState([]);
+  const [queueStages, setQueueStages] = useState<queueStages[]>([]);
 
   const resetAlert = () => {
     setSuccess(false);
@@ -139,21 +154,21 @@ export default function QueueDashboardPage() {
     setMessage("");
   };
 
-  const fetchQueue = async () => {
+  const fetchQueueStages = async () => {
     try {
-      const res = await fetch(`/api/queue?tenantId=${tenantID}`);
+      const res = await fetch(`/api/stage?tenantId=${tenantID}`);
       const json = await res.json();
-      setQueue(json.data || []);
+      setQueueStages(json.data || []);
     } catch (err) {
-      console.log("Failed to fetch queue:", err);
+      console.log("Failed to fetch queue stages:", err);
     }
   };
 
   useEffect(() => {
-    const loadQueue = async () => {
-      await fetchQueue();
+    const loadQueueStages = async () => {
+      await fetchQueueStages();
     };
-    loadQueue();
+    loadQueueStages();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -188,14 +203,14 @@ export default function QueueDashboardPage() {
       setSuccess(true);
       setMessage(data.message);
       setLoading(false);
-      await fetchQueue();
+      await fetchQueueStages();
     } catch (err) {
       setError(true);
       setMessage((err as Error).message || "Something went wrong");
     }
   };
 
-  console.log(queue);
+  console.log(queueStages);
   return (
     <div className="p-4 md:p-6">
       <div className="flex justify-between items-center mb-6">
@@ -259,25 +274,25 @@ export default function QueueDashboardPage() {
 
       <div className="overflow-x-auto">
         <div className="flex gap-4 pb-4 min-w-max h-[calc(100vh-200px)]">
-          {stages.map((stage) => (
+          {queueStages.map((stage) => (
             <div
               key={stage.id}
               className="min-w-[300px] w-[300px] flex flex-col"
             >
               <div className="flex justify-between items-center p-4 rounded-t-lg bg-slate-100 dark:bg-slate-900">
                 <h2 className="font-semibold text-gray-800 dark:text-gray-100">
-                  {stage.title}
+                  {stage.name}
                 </h2>
                 <span className="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-semibold text-blue-800">
-                  {stage.patients.length}
+                  {stage.entries.length}
                 </span>
               </div>
               <div className="h-1 bg-indigo-600 w-full"></div>
 
               <div className="p-4 bg-slate-100/70 dark:bg-slate-900/70 rounded-b-lg space-y-4 flex-1 overflow-y-auto min-h-[200px]">
-                {stage.patients.length > 0 ? (
-                  stage.patients.map((patient) => (
-                    <PatientCard key={patient.id} patient={patient} />
+                {stage.entries.length > 0 ? (
+                  stage.entries.map((entrie) => (
+                    <PatientCard key={entrie.id} entrie={entrie} />
                   ))
                 ) : (
                   <div className="flex justify-center items-center h-24 text-sm text-gray-500">
