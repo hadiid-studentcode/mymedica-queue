@@ -140,3 +140,17 @@ Karena _unit test_ tidak diimplementasikan, pengujian dapat dilakukan secara man
 5.  Navigasikan ke menu **Queue** untuk menambahkan pasien baru ke antrian.
 6.  Gunakan tombol aksi di dasbor untuk "Memproses" pasien (memindahkan ke tahap selanjutnya) atau "Menyelesaikan" antrian.
 7.  Saat pasien baru ditambahkan, periksa email yang diatur di `NEXT_PUBLIC_EMAIL_TO` untuk notifikasi.
+
+
+## Masalah yang Diketahui & Peningkatan
+
+Sesuai dengan dokumen persyaratan, berikut adalah beberapa poin yang perlu diperhatikan:
+
+* **Tidak Ada Docker:** Penyiapan Docker untuk *local run* tidak disertakan dalam *submission* ini. Penyiapan harus dilakukan secara manual mengikuti langkah-langkah di atas.
+* **Tidak Ada Unit Test:** *Submission* ini tidak menyertakan *unit test*.
+
+**Peningkatan di Masa Depan:**
+
+* Menambahkan *unit test* dan *integration test* menggunakan Jest atau Vitest.
+* Mengimplementasikan *Docker setup* (Docker Compose) untuk mempermudah penyiapan lokal.
+* Menambahkan fungsionalitas "Tampilan Pasien" opsional (halaman publik di mana pasien dapat melihat posisi antrian mereka).
